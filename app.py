@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import Response
+from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 import httpx
 from pathlib import Path
@@ -231,6 +231,9 @@ Sitemap: {BASE_URL}/sitemap.xml
         }
     )
 
+@app.get("/og-image.png")
+def og_image():
+    return FileResponse("static/og-image.png", media_type="image/png")
 
 # Mount static files at root, with HTML fallback (must be after API routes)
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
