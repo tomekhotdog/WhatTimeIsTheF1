@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Formula 1 Race Countdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* F1-style background pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.02) 10px,
+                    rgba(255, 255, 255, 0.02) 20px
+                );
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        0 0 60px rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #race-container {
+            margin-top: 30px;
+        }
+
+        .race-info {
+            margin-bottom: 30px;
+        }
+
+        .race-name {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .race-location {
+            font-size: 1.3em;
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .race-time {
+            font-size: 1em;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .race-time > div {
+            margin-bottom: 8px;
+        }
+
+        .countdown {
+            font-size: 3.5em;
+            margin: 40px 0;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #dc2626;
+            text-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .countdown-value {
+            font-size: 1.2em;
+            line-height: 1.2;
+        }
+
+        .countdown-label {
+            font-size: 0.3em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .details-button {
+            display: inline-block;
+            background-color: #dc2626;
+            color: #ffffff;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            margin-top: 20px;
+        }
+
+        .details-button:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+        }
+
+        .details-button:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            font-size: 1.2em;
+            color: #888;
+            margin: 40px 0;
+        }
+
+        .no-races {
+            font-size: 1.5em;
+            color: #888;
+            margin: 40px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .error {
+            font-size: 1.2em;
+            color: #dc2626;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .race-name {
+                font-size: 1.5em;
+            }
+
+            .countdown {
+                font-size: 2.5em;
+                gap: 10px;
+            }
+
+            .countdown-unit {
+                min-width: 70px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Formula 1</h1>
+        <div class="subtitle">Next Race Countdown</div>
+        <div id="race-container">
+            <div class="loading">Loading race data...</div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchNextRace() {
+            try {
+                const response = await fetch('/api/next');
+                const data = await response.json();
+
+                const raceContainer = document.getElementById('race-container');
+                raceContainer.innerHTML = '';
+
+                if (data.status === 'ok') {
+                    const race = data.next;
+                    const startTime = new Date(race.startUtc);
+
+                    // Create race info section
+                    const raceInfo = document.createElement('div');
+                    raceInfo.className = 'race-info';
+                    raceInfo.innerHTML = `
+                        <div class="race-name">${race.name}</div>
+                        <div class="race-location">${race.location}${race.country ? `, ${race.country}` : ''}</div>
+                        <div class="race-time">
+                            <div>Start (UTC): ${startTime.toLocaleString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                timeZone: 'UTC',
+                                timeZoneName: 'short'
+                            })}</div>
+                            <div>Start (Local): ${startTime.toLocaleString(undefined, {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                timeZoneName: 'short'
+                            })}</div>
+                        </div>
+                    `;
+                    raceContainer.appendChild(raceInfo);
+
+                    // Create countdown section
+                    const countdown = document.createElement('div');
+                    countdown.className = 'countdown';
+                    countdown.id = 'countdown';
+                    raceContainer.appendChild(countdown);
+
+                    // Create details button
+                    if (race.url) {
+                        const detailsButton = document.createElement('a');
+                        detailsButton.className = 'details-button';
+                        detailsButton.href = race.url;
+                        detailsButton.target = '_blank';
+                        detailsButton.rel = 'noopener noreferrer';
+                        detailsButton.textContent = 'Race Weekend Details';
+                        raceContainer.appendChild(detailsButton);
+                    }
+
+                    // Update countdown function
+                    function updateCountdown() {
+                        const now = new Date();
+                        const timeDiff = startTime - now;
+
+                        if (timeDiff <= 0) {
+                            countdown.innerHTML = '<div class="countdown-unit"><div class="countdown-value">Race Started!</div></div>';
+                            clearInterval(interval);
+                            return;
+                        }
+
+                        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                        countdown.innerHTML = `
+                            ${days > 0 ? `<div class="countdown-unit"><div class="countdown-value">${String(days).padStart(2, '0')}</div><div class="countdown-label">Days</div></div>` : ''}
+                            <div class="countdown-unit"><div class="countdown-value">${String(hours).padStart(2, '0')}</div><div class="countdown-label">Hours</div></div>
+                            <div class="countdown-unit"><div class="countdown-value">${String(minutes).padStart(2, '0')}</div><div class="countdown-label">Minutes</div></div>
+                            <div class="countdown-unit"><div class="countdown-value">${String(seconds).padStart(2, '0')}</div><div class="countdown-label">Seconds</div></div>
+                        `;
+                    }
+
+                    updateCountdown();
+                    const interval = setInterval(updateCountdown, 1000);
+                } else {
+                    raceContainer.innerHTML = '<div class="no-races">No upcoming races</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching race data:', error);
+                document.getElementById('race-container').innerHTML = '<div class="error">Error loading race data. Please try again later.</div>';
+            }
+        }
+
+        // Fetch race data on load
+        fetchNextRace();
+    </script>
+</body>
+</html>
+
