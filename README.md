@@ -28,48 +28,16 @@ A production-ready web application that displays the next upcoming Formula 1 rac
 ### Prerequisites
 
 - Python 3.11 or higher
-- pip (Python package manager)
 
-### Setup Steps
+### Quick Start
 
-1. **Clone or navigate to the project directory:**
+```bash
+./run.sh
+```
 
-   ```bash
-   cd WhatTimeIsTheF1
-   ```
+This creates a virtual environment, installs dependencies, and starts the dev server with auto-reload at [http://localhost:8000](http://localhost:8000).
 
-2. **Create a virtual environment (recommended):**
-
-   ```bash
-   pyenv virtualenv 3.11.6 what-time-is-the-f1
-   pyenv activate what-time-is-the-f1
-   ```
-
-3. **Install dependencies:**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the application:**
-
-   ```bash
-   uvicorn app:app --reload
-   ```
-
-   The `--reload` flag enables auto-reload on code changes (useful for development).
-
-5. **Access the application:**
-
-   Open your browser and navigate to:
-   ```
-   http://localhost:8000
-   ```
-
-   The API endpoint is available at:
-   ```
-   http://localhost:8000/api/next
-   ```
+The API endpoint is available at [http://localhost:8000/api/next](http://localhost:8000/api/next).
 
 ## How to Deploy on Railway
 

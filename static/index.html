@@ -12,17 +12,52 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://whattimeisthef1.com/" />
     <meta property="og:image" content="https://whattimeisthef1.com/og-image.png" />
-    
+
     <!-- Twitter (X) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="What Time Is The F1?" />
     <meta name="twitter:description" content="See when the next F1 race starts." />
     <meta name="twitter:image" content="https://whattimeisthef1.com/og-image.png" />
-    
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="alternate icon" href="/favicon.ico">
     <style>
+        :root {
+            --bg-gradient-from: #0a0a0a;
+            --bg-gradient-to: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #aaaaaa;
+            --accent: #dc2626;
+            --accent-hover: #b91c1c;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: rgba(0, 0, 0, 0.5);
+            --accent-glow: rgba(220, 38, 38, 0.1);
+            --stripe-color: rgba(255, 255, 255, 0.02);
+            --session-row-hover: rgba(255, 255, 255, 0.05);
+            --session-finished: #555555;
+            --badge-live-bg: #dc2626;
+        }
+
+        [data-theme="light"] {
+            --bg-gradient-from: #f0f0f0;
+            --bg-gradient-to: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #555555;
+            --accent: #dc2626;
+            --accent-hover: #b91c1c;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --card-shadow: rgba(0, 0, 0, 0.15);
+            --accent-glow: rgba(220, 38, 38, 0.05);
+            --stripe-color: rgba(0, 0, 0, 0.02);
+            --session-row-hover: rgba(0, 0, 0, 0.04);
+            --session-finished: #aaaaaa;
+            --badge-live-bg: #dc2626;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -31,8 +66,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #ffffff;
+            background: linear-gradient(135deg, var(--bg-gradient-from) 0%, var(--bg-gradient-to) 100%);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -43,36 +78,48 @@
             overflow-x: hidden;
         }
 
-        /* F1-style background pattern */
         body::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 10px,
-                    rgba(255, 255, 255, 0.02) 10px,
-                    rgba(255, 255, 255, 0.02) 20px
-                );
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: repeating-linear-gradient(
+                45deg, transparent, transparent 10px,
+                var(--stripe-color) 10px, var(--stripe-color) 20px
+            );
             pointer-events: none;
         }
+
+        .theme-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .theme-toggle:hover { opacity: 0.7; }
 
         .container {
             max-width: 800px;
             width: 100%;
             text-align: center;
             z-index: 1;
-            background: rgba(20, 20, 20, 0.8);
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
-                        0 0 60px rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px var(--card-shadow), 0 0 60px var(--accent-glow);
+            border: 1px solid var(--card-border);
         }
 
         h1 {
@@ -84,7 +131,7 @@
         }
 
         h1 a {
-            background: linear-gradient(135deg, #ffffff 0%, #dc2626 100%);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -92,30 +139,20 @@
             transition: opacity 0.3s ease;
         }
 
-        h1 a:hover {
-            opacity: 0.8;
-        }
+        h1 a:hover { opacity: 0.8; }
 
         .subtitle {
             font-size: 1em;
-            color: #888;
+            color: var(--text-secondary);
             margin-bottom: 40px;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        #race-container {
-            margin-top: 30px;
-        }
-
-        .race-info {
-            margin-bottom: 30px;
-        }
-
         .race-name {
             font-size: 2em;
             margin-bottom: 15px;
-            color: #ffffff;
+            color: var(--text-primary);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -123,27 +160,112 @@
 
         .race-location {
             font-size: 1.3em;
-            color: #dc2626;
+            color: var(--accent);
             margin-bottom: 10px;
             font-weight: 500;
         }
 
-        .race-time {
-            font-size: 1em;
-            color: #aaa;
-            margin-bottom: 30px;
+        .timezone-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
         }
 
-        .race-time > div {
-            margin-bottom: 8px;
+        .timezone-label strong {
+            color: var(--text-muted);
         }
 
+        /* Session schedule */
+        .session-schedule {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .session-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            transition: background 0.15s;
+            gap: 10px;
+        }
+
+        .session-row:hover {
+            background: var(--session-row-hover);
+        }
+
+        .session-row.finished {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+
+        .session-row.next-up {
+            background: var(--session-row-hover);
+            border-left: 3px solid var(--accent);
+        }
+
+        .session-label {
+            font-weight: 600;
+            min-width: 140px;
+            font-size: 0.95em;
+        }
+
+        .session-time {
+            color: var(--text-muted);
+            font-size: 0.95em;
+            flex: 1;
+            text-align: right;
+        }
+
+        .session-status {
+            min-width: 60px;
+            text-align: center;
+            font-size: 0.8em;
+        }
+
+        .session-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cal-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1em;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            line-height: 1;
+        }
+
+        .cal-link:hover { opacity: 1; }
+
+        .badge-live {
+            display: inline-block;
+            background: var(--badge-live-bg);
+            color: #fff;
+            font-size: 0.75em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: pulse-live 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-live {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Countdown */
         .countdown {
             font-size: 3.5em;
-            margin: 40px 0;
+            margin: 30px 0;
             font-weight: 700;
             font-family: 'Courier New', monospace;
-            color: #dc2626;
+            color: var(--accent);
             text-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
             display: flex;
             justify-content: center;
@@ -158,54 +280,88 @@
             min-width: 100px;
         }
 
-        .countdown-value {
-            font-size: 1.2em;
-            line-height: 1.2;
-        }
+        .countdown-value { font-size: 1.2em; line-height: 1.2; }
 
         .countdown-label {
             font-size: 0.3em;
-            color: #888;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-top: 5px;
         }
 
-        .details-button {
-            display: inline-block;
-            background-color: #dc2626;
-            color: #ffffff;
-            padding: 15px 40px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            font-weight: 600;
+        .countdown-target {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Weather */
+        .weather-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .weather-title {
+            font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
-            margin-top: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
         }
 
-        .details-button:hover {
-            background-color: #b91c1c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+        .weather-days {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-        .details-button:active {
-            transform: translateY(0);
+        .weather-day {
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--session-row-hover);
+            min-width: 80px;
+        }
+
+        .weather-day-date {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .weather-day-icon { font-size: 1.5em; }
+
+        .weather-day-temp {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .weather-day-rain {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+        }
+
+        .weather-placeholder {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-style: italic;
         }
 
         .loading {
             font-size: 1.2em;
-            color: #888;
+            color: var(--text-secondary);
             margin: 40px 0;
         }
 
         .no-races {
             font-size: 1.5em;
-            color: #888;
+            color: var(--text-secondary);
             margin: 40px 0;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -213,35 +369,24 @@
 
         .error {
             font-size: 1.2em;
-            color: #dc2626;
+            color: var(--accent);
             margin: 40px 0;
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .race-name {
-                font-size: 1.5em;
-            }
-
-            .countdown {
-                font-size: 2.5em;
-                gap: 10px;
-            }
-
-            .countdown-unit {
-                min-width: 70px;
-            }
-
-            .container {
-                padding: 20px;
-            }
+            h1 { font-size: 1.8em; }
+            .race-name { font-size: 1.5em; }
+            .countdown { font-size: 2.5em; gap: 10px; }
+            .countdown-unit { min-width: 70px; }
+            .container { padding: 20px; }
+            .session-label { min-width: 100px; font-size: 0.85em; }
+            .session-time { font-size: 0.85em; }
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+
     <div class="container">
         <h1><a href="https://www.formula1.com/" target="_blank" rel="noopener noreferrer">Formula 1</a></h1>
         <div class="subtitle">Next Race Countdown</div>
@@ -251,95 +396,233 @@
     </div>
 
     <script>
+        // --- Theme ---
+        (function initTheme() {
+            const saved = localStorage.getItem('f1-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            updateToggleIcon(theme);
+        })();
+
+        function updateToggleIcon(theme) {
+            const btn = document.getElementById('theme-toggle');
+            btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const newTheme = isLight ? 'dark' : 'light';
+            if (newTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            localStorage.setItem('f1-theme', newTheme);
+            updateToggleIcon(newTheme);
+        });
+
+        // --- Timezone ---
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // --- WMO weather code to emoji ---
+        function weatherEmoji(code) {
+            if (code === 0) return '☀️';
+            if (code <= 3) return '⛅';
+            if (code <= 48) return '🌫️';
+            if (code <= 55) return '🌦️';
+            if (code <= 57) return '🌧️';
+            if (code <= 65) return '🌧️';
+            if (code <= 67) return '🌧️';
+            if (code <= 75) return '🌨️';
+            if (code <= 77) return '🌨️';
+            if (code <= 82) return '🌧️';
+            if (code <= 86) return '🌨️';
+            if (code <= 99) return '⛈️';
+            return '🌡️';
+        }
+
+        // --- Google Calendar link ---
+        function makeCalLink(raceName, sessionLabel, startUtc, durationMin) {
+            const start = new Date(startUtc);
+            const end = new Date(start.getTime() + durationMin * 60000);
+            const fmt = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+            const title = encodeURIComponent(`F1: ${raceName} - ${sessionLabel}`);
+            const dates = `${fmt(start)}/${fmt(end)}`;
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}`;
+        }
+
+        // --- Format time in user's timezone ---
+        function formatSessionTime(utcIso) {
+            const d = new Date(utcIso);
+            return d.toLocaleString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: userTimezone
+            });
+        }
+
+        // --- Main ---
         async function fetchNextRace() {
             try {
                 const response = await fetch('/api/next');
                 const data = await response.json();
+                const container = document.getElementById('race-container');
+                container.innerHTML = '';
 
-                const raceContainer = document.getElementById('race-container');
-                raceContainer.innerHTML = '';
+                if (data.status !== 'ok') {
+                    container.innerHTML = '<div class="no-races">No upcoming races</div>';
+                    return;
+                }
 
-                if (data.status === 'ok') {
-                    const race = data.next;
-                    const startTime = new Date(race.startUtc);
+                const race = data.next;
+                const sessions = race.sessions || [];
 
-                    // Create race info section
-                    const raceInfo = document.createElement('div');
-                    raceInfo.className = 'race-info';
-                    raceInfo.innerHTML = `
-                        <div class="race-name">${race.name}</div>
-                        <div class="race-location">${race.location}${race.country ? `, ${race.country}` : ''}</div>
-                        <div class="race-time">
-                            <div>Start (UTC): ${startTime.toLocaleString('en-GB', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                                timeZone: 'UTC',
-                                timeZoneName: 'short'
-                            })}</div>
-                            <div>Start (Local): ${startTime.toLocaleString(undefined, {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                                timeZoneName: 'short'
-                            })}</div>
-                        </div>
+                // Find next upcoming session for countdown
+                const now = new Date();
+                let countdownSession = null;
+                for (const s of sessions) {
+                    if (s.status === 'upcoming') { countdownSession = s; break; }
+                }
+                // If all live/finished and there's a live one, no countdown target
+                const liveSession = sessions.find(s => s.status === 'live');
+
+                // Race info
+                const info = document.createElement('div');
+                info.className = 'race-info';
+                info.innerHTML = `
+                    <div class="race-name">${race.name}</div>
+                    <div class="race-location">${race.location}${race.country ? `, ${race.country}` : ''}</div>
+                    <div class="timezone-label">Times shown in <strong>${userTimezone}</strong></div>
+                `;
+                container.appendChild(info);
+
+                // Session schedule
+                const schedule = document.createElement('div');
+                schedule.className = 'session-schedule';
+
+                for (const s of sessions) {
+                    const row = document.createElement('div');
+                    row.className = 'session-row';
+                    if (s.status === 'finished') row.classList.add('finished');
+                    if (countdownSession && s.key === countdownSession.key) row.classList.add('next-up');
+
+                    let statusHtml = '';
+                    if (s.status === 'live') {
+                        statusHtml = '<span class="badge-live">LIVE</span>';
+                    } else if (s.status === 'finished') {
+                        statusHtml = '<span style="color:var(--session-finished);font-size:0.8em">Finished</span>';
+                    }
+
+                    const calUrl = makeCalLink(race.name, s.label, s.startUtc, s.durationMin);
+
+                    row.innerHTML = `
+                        <span class="session-label">${s.label}</span>
+                        <span class="session-time">${formatSessionTime(s.startUtc)}</span>
+                        <span class="session-status">${statusHtml}</span>
+                        <span class="session-actions">
+                            <a class="cal-link" href="${calUrl}" target="_blank" rel="noopener noreferrer" title="Add to Google Calendar">📅</a>
+                        </span>
                     `;
-                    raceContainer.appendChild(raceInfo);
+                    schedule.appendChild(row);
+                }
+                container.appendChild(schedule);
 
-                    // Create countdown section
+                // Countdown
+                if (countdownSession) {
+                    const targetLabel = document.createElement('div');
+                    targetLabel.className = 'countdown-target';
+                    targetLabel.textContent = `Countdown to ${countdownSession.label}`;
+                    container.appendChild(targetLabel);
+
                     const countdown = document.createElement('div');
                     countdown.className = 'countdown';
                     countdown.id = 'countdown';
-                    raceContainer.appendChild(countdown);
+                    container.appendChild(countdown);
 
+                    const targetTime = new Date(countdownSession.startUtc);
 
-                    // Update countdown function
                     function updateCountdown() {
                         const now = new Date();
-                        const timeDiff = startTime - now;
-
-                        if (timeDiff <= 0) {
-                            countdown.innerHTML = '<div class="countdown-unit"><div class="countdown-value">Race Started!</div></div>';
+                        const diff = targetTime - now;
+                        if (diff <= 0) {
+                            countdown.innerHTML = '<div class="countdown-unit"><div class="countdown-value">Session Starting!</div></div>';
                             clearInterval(interval);
+                            setTimeout(fetchNextRace, 5000);
                             return;
                         }
-
-                        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
+                        const days = Math.floor(diff / 86400000);
+                        const hours = Math.floor((diff % 86400000) / 3600000);
+                        const minutes = Math.floor((diff % 3600000) / 60000);
+                        const seconds = Math.floor((diff % 60000) / 1000);
                         countdown.innerHTML = `
-                            ${days > 0 ? `<div class="countdown-unit"><div class="countdown-value">${String(days).padStart(2, '0')}</div><div class="countdown-label">Days</div></div>` : ''}
-                            <div class="countdown-unit"><div class="countdown-value">${String(hours).padStart(2, '0')}</div><div class="countdown-label">Hours</div></div>
-                            <div class="countdown-unit"><div class="countdown-value">${String(minutes).padStart(2, '0')}</div><div class="countdown-label">Minutes</div></div>
-                            <div class="countdown-unit"><div class="countdown-value">${String(seconds).padStart(2, '0')}</div><div class="countdown-label">Seconds</div></div>
+                            ${days > 0 ? `<div class="countdown-unit"><div class="countdown-value">${String(days).padStart(2,'0')}</div><div class="countdown-label">Days</div></div>` : ''}
+                            <div class="countdown-unit"><div class="countdown-value">${String(hours).padStart(2,'0')}</div><div class="countdown-label">Hours</div></div>
+                            <div class="countdown-unit"><div class="countdown-value">${String(minutes).padStart(2,'0')}</div><div class="countdown-label">Minutes</div></div>
+                            <div class="countdown-unit"><div class="countdown-value">${String(seconds).padStart(2,'0')}</div><div class="countdown-label">Seconds</div></div>
                         `;
                     }
-
                     updateCountdown();
                     const interval = setInterval(updateCountdown, 1000);
-                } else {
-                    raceContainer.innerHTML = '<div class="no-races">No upcoming races</div>';
+                } else if (liveSession) {
+                    const liveMsg = document.createElement('div');
+                    liveMsg.className = 'countdown';
+                    liveMsg.innerHTML = '<div class="countdown-unit"><div class="countdown-value"><span class="badge-live" style="font-size:0.6em">LIVE NOW</span></div></div>';
+                    container.appendChild(liveMsg);
                 }
+
+                // Weather
+                const weatherSection = document.createElement('div');
+                weatherSection.className = 'weather-section';
+                container.appendChild(weatherSection);
+
+                if (race.latitude && race.longitude) {
+                    const gpTime = new Date(race.startUtc);
+                    const daysUntilRace = (gpTime - now) / 86400000;
+
+                    if (daysUntilRace <= 7) {
+                        weatherSection.innerHTML = '<div class="weather-title">Race Weekend Weather</div><div class="loading" style="margin:10px 0;font-size:0.9em">Loading weather...</div>';
+                        try {
+                            const wResp = await fetch(`/api/weather?lat=${race.latitude}&lon=${race.longitude}`);
+                            const wData = await wResp.json();
+                            if (wData.status === 'ok' && wData.daily.length > 0) {
+                                let daysHtml = '';
+                                // Show up to 5 days around the race
+                                for (const day of wData.daily.slice(0, 5)) {
+                                    const d = new Date(day.date + 'T00:00:00Z');
+                                    const label = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' });
+                                    daysHtml += `
+                                        <div class="weather-day">
+                                            <div class="weather-day-date">${label}</div>
+                                            <div class="weather-day-icon">${weatherEmoji(day.weatherCode)}</div>
+                                            <div class="weather-day-temp">${Math.round(day.tempMin)}° / ${Math.round(day.tempMax)}°</div>
+                                            <div class="weather-day-rain">💧 ${day.precipProb}%</div>
+                                        </div>
+                                    `;
+                                }
+                                weatherSection.innerHTML = `<div class="weather-title">Race Weekend Weather</div><div class="weather-days">${daysHtml}</div>`;
+                            } else {
+                                weatherSection.innerHTML = '';
+                            }
+                        } catch {
+                            weatherSection.innerHTML = '';
+                        }
+                    } else {
+                        weatherSection.innerHTML = '<div class="weather-title">Weather</div><div class="weather-placeholder">Weather forecast available closer to race day</div>';
+                    }
+                }
+
             } catch (error) {
                 console.error('Error fetching race data:', error);
                 document.getElementById('race-container').innerHTML = '<div class="error">Error loading race data. Please try again later.</div>';
             }
         }
 
-        // Fetch race data on load
         fetchNextRace();
     </script>
 </body>
 </html>
-
