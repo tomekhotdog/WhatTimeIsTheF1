@@ -100,4 +100,4 @@ Root domain switched 2026-10-25 and checked via Cloudflare's nameservers: served
 - [x] Commit and push the migration to `main` (858b288)
 - [x] Dashboard → Workers & Pages → `whattimeisthef1` → Settings → Builds → **Connect** → GitHub → `tomekhotdog/WhatTimeIsTheF1`
   - Branch: `main`; Build command: empty; Deploy command: `npx wrangler deploy` (default); Root directory: `/`
-- [ ] Push a small change and check it appears on the Worker's **Deployments** tab and on the live site
+- [x] Push a small change and check it deploys: aa7bfe5 pushed 22:14:07 UTC, new version 7b023717 live at 22:14:30 UTC
