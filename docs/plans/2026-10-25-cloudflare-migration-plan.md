@@ -97,7 +97,7 @@ Root domain switched 2026-10-25 and checked via Cloudflare's nameservers: served
 
 ### 8. Optional: deploy on every push
 - [x] Added `package.json` pinning `wrangler` 4.149.0 (safe now that Railway is gone), so Workers Builds and local dev use the same version
-- [ ] Commit and push the migration to `main`
-- [ ] Dashboard → Workers & Pages → `whattimeisthef1` → Settings → Builds → **Connect** → GitHub → `tomekhotdog/WhatTimeIsTheF1`
+- [x] Commit and push the migration to `main` (858b288)
+- [x] Dashboard → Workers & Pages → `whattimeisthef1` → Settings → Builds → **Connect** → GitHub → `tomekhotdog/WhatTimeIsTheF1`
   - Branch: `main`; Build command: empty; Deploy command: `npx wrangler deploy` (default); Root directory: `/`
 - [ ] Push a small change and check it appears on the Worker's **Deployments** tab and on the live site
