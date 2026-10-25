@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://whattimeisthef1.com/sitemap.xml

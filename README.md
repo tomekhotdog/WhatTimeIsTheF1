@@ -1,13 +1,13 @@
 # Formula 1 Next Race Countdown
 
-A production-ready web application that displays the next upcoming Formula 1 race with a live countdown timer. Built with FastAPI backend and a modern, dark-themed frontend.
+A web application that displays the next upcoming Formula 1 race with a live countdown timer. Static frontend plus a small Cloudflare Worker for the API, served from [whattimeisthef1.com](https://whattimeisthef1.com).
 
 ## Features
 
 - ✅ Real-time countdown to the next F1 race
 - ✅ Automatic timezone conversion to user's local time
 - ✅ Beautiful dark F1-style theme
-- ✅ 1-hour in-memory cache for race data
+- ✅ 1-hour cache for race and weather data
 - ✅ Responsive design for mobile and desktop
 - ✅ Direct link to race weekend details
 
@@ -15,86 +15,47 @@ A production-ready web application that displays the next upcoming Formula 1 rac
 
 ```
 .
-├── app.py              # FastAPI backend application
-├── requirements.txt    # Python dependencies
-├── Procfile           # Railway deployment configuration
-├── README.md          # This file
-└── static/
-    └── index.html     # Frontend HTML/CSS/JS
+├── worker.js          # Cloudflare Worker: /api/next and /api/weather
+├── wrangler.jsonc     # Cloudflare Worker configuration (incl. custom domain)
+├── package.json       # Pins the wrangler version
+├── static/            # Served as-is by Cloudflare
+│   ├── index.html     # Frontend HTML/CSS/JS
+│   ├── robots.txt
+│   ├── sitemap.xml
+│   ├── favicon.svg
+│   └── og-image.png
+└── README.md          # This file
 ```
 
 ## How to Run Locally
 
 ### Prerequisites
 
-- Python 3.11 or higher
+- Node.js 20 or higher
 
 ### Quick Start
 
 ```bash
-./run.sh
+npm install
+npm run dev
 ```
 
-This creates a virtual environment, installs dependencies, and starts the dev server with auto-reload at [http://localhost:8000](http://localhost:8000).
+This serves the site and the Worker with auto-reload at [http://localhost:8787](http://localhost:8787).
 
-The API endpoint is available at [http://localhost:8000/api/next](http://localhost:8000/api/next).
+The API endpoint is available at [http://localhost:8787/api/next](http://localhost:8787/api/next).
 
-## How to Deploy on Railway
+## How to Deploy on Cloudflare
 
-Railway makes deploying from GitHub incredibly simple. This is the easiest method and is recommended for most users.
+Every push to `main` deploys automatically through Cloudflare Workers Builds (connected to this GitHub repo in the Cloudflare dashboard: Worker → Settings → Builds). Build logs are on the Worker's **Deployments** tab.
 
-### Deploy from GitHub (Recommended)
+To deploy by hand from your machine:
 
-1. **Push your code to GitHub:**
+```bash
+npx wrangler login    # once
+npm run deploy
+```
 
-   If you haven't already, create a repository and push your code:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin <your-github-repo-url>
-   git push -u origin main
-   ```
-
-2. **Sign up/Login to Railway:**
-
-   Go to [railway.app](https://railway.app) and sign up or log in. You can sign up with your GitHub account for easier integration.
-
-3. **Create a new project:**
-
-   - Click "New Project"
-   - Select "Deploy from GitHub repo"
-   - Choose your repository (`WhatTimeIsTheF1`)
-
-4. **Railway automatically configures everything:**
-
-   - Railway detects the `Procfile` and uses it to run your app
-   - It installs dependencies from `requirements.txt`
-   - It sets up the `$PORT` environment variable automatically
-   - No additional configuration needed!
-
-5. **Your app is live:**
-
-   Railway provides a URL (like `https://your-app-name.up.railway.app`) where your app is accessible. Every time you push to GitHub, Railway automatically redeploys your app.
-
-### Alternative: Using Railway CLI
-
-If you prefer using the command line:
-
-1. Install Railway CLI: `npm install -g @railway/cli`
-2. Login: `railway login`
-3. Initialize: `railway init`
-4. Deploy: `railway up`
-
-See [Railway CLI Docs](https://docs.railway.app/develop/cli) for more details.
-
-### Notes for Railway Deployment
-
-- The `Procfile` tells Railway how to run your application using uvicorn
-- Railway automatically assigns a `$PORT` environment variable - the Procfile uses this
-- No Dockerfile is needed - Railway detects Python applications and uses the Procfile
-- Make sure `requirements.txt` is in the root directory
-- Railway automatically deploys on every Git push to your connected branch
+Static files in `static/` are served directly by Cloudflare. Only `/api/*` requests run the Worker (`run_worker_first` in `wrangler.jsonc`). DNS for whattimeisthef1.com is on Cloudflare (domain registered at Namecheap); `www` redirects to the root domain via a Cloudflare Redirect Rule. Migration history is in [docs/plans/2026-10-25-cloudflare-migration-plan.md](docs/plans/2026-10-25-cloudflare-migration-plan.md).
 
 ## How the API Works
 
@@ -131,7 +92,7 @@ Returns information about the next upcoming Formula 1 race.
 #### How It Works
 
 1. **Data Source:**
-   - Fetches race data from: `https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2025.json`
+   - Fetches race data from: `https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2026.json`
    - This is a community-maintained JSON file with Formula 1 schedule information
 
 2. **Data Processing:**
@@ -146,12 +107,12 @@ Returns information about the next upcoming Formula 1 race.
    - If no future races are found, returns `{"status": "season_over"}`
 
 4. **Caching:**
-   - Race data is cached in memory for 1 hour
+   - Race data is cached by Cloudflare for 1 hour (`cf.cacheTtl` on the fetch)
    - This reduces external API calls and improves response times
    - Cache is automatically refreshed after 1 hour
 
 5. **Error Handling:**
-   - If the external API is unavailable, the endpoint tries to return cached data
+   - If the external API is unavailable, the endpoint tries to return the last data it fetched
    - Falls back to `{"status": "season_over"}` if no cached data is available
 
 ## Frontend Features
@@ -165,9 +126,8 @@ Returns information about the next upcoming Formula 1 race.
 ## Technologies Used
 
 - **Backend:**
-  - FastAPI - Modern, fast web framework for building APIs
-  - Uvicorn - ASGI server for running FastAPI (installed via requirements.txt)
-  - httpx - Async HTTP client for fetching external data
+  - Cloudflare Workers - runs `/api/*` and serves the static files
+  - Wrangler - Cloudflare's CLI for local dev and deploys
 
 - **Frontend:**
   - Vanilla HTML/CSS/JavaScript - No frameworks needed
@@ -176,23 +136,16 @@ Returns information about the next upcoming Formula 1 race.
 
 ## Troubleshooting
 
-### Issue: "Module not found" errors
-
-**Solution:** Make sure your virtual environment is activated and all dependencies are installed:
-```bash
-pip install -r requirements.txt
-```
-
 ### Issue: Port already in use
 
 **Solution:** Use a different port:
 ```bash
-uvicorn app:app --port 8001
+npm run dev -- --port 8788
 ```
 
 ### Issue: Race data not updating
 
-**Solution:** The cache refreshes after 1 hour. For testing, you can restart the server or temporarily reduce the `CACHE_DURATION` in `app.py`.
+**Solution:** Cloudflare caches the data source for 1 hour. Locally, restart `wrangler dev`.
 
 ### Issue: "No upcoming races" when there should be one
 
@@ -200,6 +153,7 @@ uvicorn app:app --port 8001
 - Check that the data source URL is accessible
 - Verify the current date/time on your system
 - Check the browser console for JavaScript errors
+- Check Worker logs: `npx wrangler tail`
 
 ## License
 
