@@ -8,6 +8,8 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
+  // Keep the workers.dev URL as a backup address alongside the custom domain
+  "workers_dev": true,
   "routes": [
     { "pattern": "whattimeisthef1.com", "custom_domain": true }
   ]
