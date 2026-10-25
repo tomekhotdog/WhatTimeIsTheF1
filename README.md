@@ -55,7 +55,13 @@ npx wrangler login    # once
 npm run deploy
 ```
 
-Static files in `static/` are served directly by Cloudflare. Only `/api/*` requests run the Worker (`run_worker_first` in `wrangler.jsonc`). DNS for whattimeisthef1.com is on Cloudflare (domain registered at Namecheap); `www` redirects to the root domain via a Cloudflare Redirect Rule. Migration history is in [docs/plans/2026-10-25-cloudflare-migration-plan.md](docs/plans/2026-10-25-cloudflare-migration-plan.md).
+Static files in `static/` are served directly by Cloudflare. Only `/api/*` requests run the Worker (`run_worker_first` in `wrangler.jsonc`). Domain and DNS setup (done in the Cloudflare dashboard, not in this repo):
+
+- The domain is registered at Namecheap, with its nameservers pointed at Cloudflare.
+- `whattimeisthef1.com` is attached to the Worker as a custom domain (`routes` in `wrangler.jsonc`).
+- `www` is a proxied `AAAA` placeholder record (`100::`), redirected to the root domain by a Redirect Rule ("Redirect from WWW to root" template).
+- **Always Use HTTPS** is on (SSL/TLS → Edge Certificates). The `www` redirect only matches `https://`, so without it `http://www` fails with a 522.
+- Backup address, in case the domain lapses: https://whattimeisthef1.tomek-szymaniec.workers.dev (`workers_dev` in `wrangler.jsonc`).
 
 ## How the API Works
 
